@@ -41,9 +41,9 @@ public class WalletServiceImp implements WalletService {
         Wallet oldWallet = walletRepository.findById(id).orElse(null);
         if(oldWallet != null){
             if(oldWallet.getUserId() == wallet.getUserId()){
+                insertIntoHistory(wallet.getUserId(),id,oldWallet.getAmount(), oldWallet.getAmount() + wallet.getAmount(),"Cash In");
                 oldWallet.setAmount(oldWallet.getAmount() + wallet.getAmount());
                 walletRepository.save(oldWallet);
-                insertIntoHistory(wallet.getUserId(),id,oldWallet.getAmount(),oldWallet.getAmount() + wallet.getAmount(),"Cash In");
                 return oldWallet;
             }
         }
@@ -61,9 +61,9 @@ public class WalletServiceImp implements WalletService {
         if(oldWallet != null){
             if(oldWallet.getUserId() == wallet.getUserId()){
                 if(oldWallet.getAmount() > wallet.getAmount()){
+                    insertIntoHistory(wallet.getUserId(),id,oldWallet.getAmount(), oldWallet.getAmount() - wallet.getAmount(),"Cash Out");
                     oldWallet.setAmount(oldWallet.getAmount() - wallet.getAmount());
                     walletRepository.save(oldWallet);
-                    insertIntoHistory(wallet.getUserId(),id,oldWallet.getAmount(),oldWallet.getAmount() - wallet.getAmount(),"Cash Out");
                     return oldWallet;
                 }
             }
@@ -81,9 +81,9 @@ public class WalletServiceImp implements WalletService {
     @Override
     public void updateAmount(Wallet walletRequest) {
         Wallet wallet = walletRepository.findByUserId(walletRequest.getUserId()).orElse(null);
+        insertIntoHistory(wallet.getUserId(),wallet.getId(),wallet.getAmount(),walletRequest.getAmount(),"Booking");
         wallet.setAmount(walletRequest.getAmount());
         walletRepository.save(wallet);
-        insertIntoHistory(wallet.getUserId(),wallet.getId(),wallet.getAmount(),walletRequest.getAmount(),"Booking");
     }
 
     private Wallet findByUserId(Long userId){
